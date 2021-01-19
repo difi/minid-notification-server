@@ -58,8 +58,9 @@ public class NotificationServiceTest {
         RegistrationDevice registrationDevice = RegistrationDevice.builder()
                 .token("snazzytoken1234")
                 .personIdentifier("01030099326")
+                .appIdentifier("no.digdir.minid.authenticator")
                 .build();
-        Mockito.when(registrationRepository.findByPersonIdentifier(anyString())).thenReturn(java.util.Optional.ofNullable(registrationDevice));
+        Mockito.when(registrationRepository.findByPersonIdentifierAndAppIdentifier(anyString(), anyString())).thenReturn(java.util.Optional.ofNullable(registrationDevice));
 
         Mockito.when(firebaseMessaging.send(any())).thenReturn("msgId-1234");
     }
@@ -74,7 +75,7 @@ public class NotificationServiceTest {
                 .title("My snazzy title")
                 .body("My even snazzier expectedMessage")
                 .person_identifier("01030099326")
-                .app_identifier("no.minid.app")
+                .app_identifier("no.digdir.minid.authenticator")
                 .aps_category("MINID_AUTH_CATEGORY")
                 .click_action("minid_auth_intent")
                 .data(dataMap)
