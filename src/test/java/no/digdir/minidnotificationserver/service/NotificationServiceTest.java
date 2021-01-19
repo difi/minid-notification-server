@@ -15,7 +15,9 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -77,7 +79,7 @@ public class NotificationServiceTest {
                 .click_action("minid_auth_intent")
                 .data(dataMap)
                 .build();
-        notificationService.send(notificationEntity);
+        notificationService.send(notificationEntity, adminContext("testUserId", "01030099326"));
 
         Message expectedMessage = Message.builder()
                 .setNotification(Notification.builder()
@@ -126,4 +128,13 @@ public class NotificationServiceTest {
         Assert.assertTrue(new ReflectionEquals(expectedAndroidConfig, "notification").matches(actualAndroidConfig));
 
     }
+
+
+    private AdminContext adminContext(String adminUserId, String personIdentifier) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(AdminContext.ADMIN_USER_ID_HEADER, adminUserId);
+        Jwt accessToken = Jwt.withTokenValue("foo").header("alg", "RS256").claim("pid", "12345").build();
+        return AdminContext.of(httpHeaders, accessToken);
+    }
+
 }
