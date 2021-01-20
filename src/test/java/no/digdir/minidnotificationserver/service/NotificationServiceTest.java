@@ -3,6 +3,7 @@ package no.digdir.minidnotificationserver.service;
 import com.google.firebase.messaging.*;
 import no.digdir.minidnotificationserver.api.notification.NotificationEntity;
 import no.digdir.minidnotificationserver.domain.RegistrationDevice;
+import no.digdir.minidnotificationserver.logging.audit.AuditService;
 import no.digdir.minidnotificationserver.repository.RegistrationRepository;
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,6 +49,8 @@ public class NotificationServiceTest {
     @MockBean
     private JwtDecoder jwtDecoderByIssuerUri;
 
+    @MockBean
+    private AuditService auditService;
 
     @Captor
     private ArgumentCaptor<Message> messageCaptor;
@@ -63,6 +66,7 @@ public class NotificationServiceTest {
         Mockito.when(registrationRepository.findByPersonIdentifierAndAppIdentifier(anyString(), anyString())).thenReturn(java.util.Optional.ofNullable(registrationDevice));
 
         Mockito.when(firebaseMessaging.send(any())).thenReturn("msgId-1234");
+        Mockito.doNothing().when(auditService).auditNotificationSend(any(), any());
     }
 
     @Test
