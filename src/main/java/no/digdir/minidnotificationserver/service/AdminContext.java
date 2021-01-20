@@ -25,5 +25,9 @@ public class AdminContext {
         return String.format("%s-%s", getAccessToken().getClaimAsString("pid"), getAdminUserId());
     }
 
+    public String getPersonIdentifier() {
+        return getAccessToken().getClaimAsString("pid");
+    }
+
 
 }

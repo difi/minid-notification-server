@@ -6,10 +6,12 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import no.digdir.minidnotificationserver.api.notification.NotificationEntity;
+import no.digdir.minidnotificationserver.config.ConfigProvider;
 import no.digdir.minidnotificationserver.domain.RegistrationDevice;
 import no.digdir.minidnotificationserver.service.AdminContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,11 @@ public class AuditService {
 
     private final Logger auditLogger = LoggerFactory.getLogger("no.digdir.logging.AuditLog");
 
-    public AuditService() {
+    public AuditService(@Autowired ConfigProvider configProvider) {
+
+        System.getProperties().setProperty("AUDIT_LOGDIR", configProvider.getAudit().getLogDir());
+        System.getProperties().setProperty("AUDIT_LOGFILE", configProvider.getAudit().getLogFile());
+
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
         try {
@@ -40,7 +46,8 @@ public class AuditService {
     public void auditRegistrationServiceRegisterDevice(RegistrationDevice device) {
         auditLogger.info(
                 "Device registered.",
-                kv("auditId", AuditID.DEVICE_REGISTER.auditId()),
+                kv("audit_id", AuditID.DEVICE_REGISTER.auditId()),
+                kv("person_identifier", device.getPersonIdentifier()),
                 kv("device", device)
         );
     }
@@ -48,16 +55,18 @@ public class AuditService {
     public void auditRegistrationServiceUpdateDevice(RegistrationDevice existingDevice, RegistrationDevice updatedDevice) {
         auditLogger.info(
                 "Device updated.",
-                kv("auditId", AuditID.DEVICE_UPDATE.auditId()),
-                kv("oldDevice", existingDevice),
-                kv("newDevice", updatedDevice)
+                kv("audit_id", AuditID.DEVICE_UPDATE.auditId()),
+                kv("person_identifier", existingDevice.getPersonIdentifier()),
+                kv("old_device", existingDevice),
+                kv("new_device", updatedDevice)
         );
     }
 
     public void auditRegistrationServiceDeleteDevice(RegistrationDevice device) {
         auditLogger.info(
                 "Device deleted.",
-                kv("auditId", AuditID.DEVICE_DELETE.auditId()),
+                kv("audit_id", AuditID.DEVICE_DELETE.auditId()),
+                kv("person_identifier", device.getPersonIdentifier()),
                 kv("device", device)
         );
     }
@@ -66,8 +75,9 @@ public class AuditService {
     public void auditNotificationSend(NotificationEntity notification, AdminContext adminContext) {
         auditLogger.info(
                 "Notification sent.",
-                kv("auditId", AuditID.NOTIFICATION_SEND.auditId()),
-                kv("adminUserId", adminContext.getFullAdminUserId()),
+                kv("audit_id", AuditID.NOTIFICATION_SEND.auditId()),
+                kv("admin_user_id", adminContext.getFullAdminUserId()),
+                kv("person_identifier", adminContext.getPersonIdentifier()),
                 kv("notification", notification)
         );
     }
