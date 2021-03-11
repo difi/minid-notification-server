@@ -12,14 +12,13 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
-import java.util.Map;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthenticationNotificationEntity {
+public class AuthorizationNotificationEntity {
     // max payload is 4KB
 
     @NotBlank
@@ -53,7 +52,7 @@ public class AuthenticationNotificationEntity {
     String serviceProvider;
 
 
-    public String key = loginAttemptId + "-" + loginAttemptCounter;
+    public String key = loginAttemptId + "_" + loginAttemptCounter;
 
 }
 

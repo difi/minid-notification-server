@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/internal/authentication")
+@RequestMapping("/api/internal/authorization")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "notification_auth")
-public class AuthenticationNotificationEndpoint {
+public class AuthorizationNotificationEndpoint {
 
     private final NotificationService notificationService;
     private final NotificationCache notificationCache;
@@ -43,14 +43,14 @@ public class AuthenticationNotificationEndpoint {
     })
     @PostMapping("/notification/send")
     @PreAuthorize("hasAuthority('SCOPE_minid:notification.send')")
-    public ResponseEntity<String> send(@RequestHeader HttpHeaders headers, @RequestBody AuthenticationNotificationEntity authenticationEntity, @AuthenticationPrincipal OAuth2AuthenticatedPrincipal principal) {
+    public ResponseEntity<String> send(@RequestHeader HttpHeaders headers, @RequestBody AuthorizationNotificationEntity authenticationEntity, @AuthenticationPrincipal OAuth2AuthenticatedPrincipal principal) {
         NotificationEntity notificationEntity = createNotificationEntity(authenticationEntity);
         notificationCache.putLoginAttempt(authenticationEntity.key, authenticationEntity);
         notificationService.send(notificationEntity, AdminContext.of(headers, principal));
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    private NotificationEntity createNotificationEntity(AuthenticationNotificationEntity authenticationEntity) {
+    private NotificationEntity createNotificationEntity(AuthorizationNotificationEntity authenticationEntity) {
         Map<String, String> data = new HashMap<>();
         data.put("request_id", authenticationEntity.key);
         data.put("request_type", "LOGIN");
